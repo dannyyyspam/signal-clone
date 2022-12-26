@@ -1,8 +1,7 @@
 import React, { useLayoutEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
-import { Button, Input, Image, Text } from "react-native-elements";
-import { KeyboardAvoidingView } from "react-native";
+import { StyleSheet, View, KeyboardAvoidingView } from "react-native";
+import { Button, Input, Text } from "react-native-elements";
 import { auth } from "../firebase";
 
 const RegisterScreen = ({ navigation }) => {
@@ -23,9 +22,7 @@ const RegisterScreen = ({ navigation }) => {
       .then((authUser) => {
         authUser.user.updateProfile({
           displayName: name,
-          photoUrl:
-            imageUrl ||
-            "https://www.pngfind.com/pngs/m/610-6104451_image-placeholder-png-user-profile-placeholder-image-png.png",
+          photoURL: imageUrl,
         });
       })
       .catch((error) => alert(error.message));

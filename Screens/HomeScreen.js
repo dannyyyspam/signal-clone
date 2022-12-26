@@ -42,11 +42,7 @@ const HomeScreen = ({ navigation }) => {
       headerLeft: () => (
         <View style={{ marginLeft: 15 }}>
           <TouchableOpacity onPress={signOutUser} activeOpacity={0.5}>
-            <Avatar
-              source={{
-                uri: "https://cdn3.iconfinder.com/data/icons/arrow-solid-1/24/logout_out_Arrow_left_back_chevron_sign-512.png",
-              }}
-            />
+            <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }} />
           </TouchableOpacity>
         </View>
       ),
@@ -73,13 +69,23 @@ const HomeScreen = ({ navigation }) => {
     });
   }, [navigation]);
 
-  
+  const enterChat = (id, chatName) => {
+    navigation.navigate("Chat", {
+      id,
+      chatName,
+    });
+  };
 
   return (
     <SafeAreaView>
       <ScrollView style={styles.container}>
         {chats.map(({ id, data: { chatName } }) => (
-          <CustomListItem id={id} chatName={chatName} key={id} />
+          <CustomListItem
+            id={id}
+            chatName={chatName}
+            key={id}
+            enterChat={enterChat}
+          />
         ))}
       </ScrollView>
     </SafeAreaView>

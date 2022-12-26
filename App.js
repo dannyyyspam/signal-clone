@@ -6,6 +6,7 @@ import LoginScreen from "./Screens/LoginScreen";
 import RegisterScreen from "./Screens/RegisterScreen";
 import HomeScreen from "./Screens/HomeScreen.js";
 import AddChatScreen from "./Screens/AddChatScreen";
+import ChatScreen from "./Screens/ChatScreen";
 
 const Stack = createNativeStackNavigator();
 
