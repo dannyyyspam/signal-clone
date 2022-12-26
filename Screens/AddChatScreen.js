@@ -5,7 +5,6 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { db } from "../firebase";
 
 const AddChatScreen = ({ navigation }) => {
-
   const [input, setInput] = useState("");
 
   useLayoutEffect(() => {
@@ -39,7 +38,7 @@ const AddChatScreen = ({ navigation }) => {
           <Icon name="wechat" type="antdesign" size={24} color="black" />
         }
       />
-      <Button onPress={createChat} title="Create new Chat" />
+      <Button disabled={!input} onPress={createChat} title="Create new Chat" />
     </View>
   );
 };

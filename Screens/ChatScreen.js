@@ -1,31 +1,31 @@
-import React, { useLayoutEffect, useState } from "react";
 import {
-  ScrollView,
-  KeyboardAvoidingView,
-  TouchableOpacity,
-  SafeAreaView,
-  TextInput,
-  StyleSheet,
-  Text,
   View,
+  Text,
+  StyleSheet,
   Platform,
+  KeyboardAvoidingView,
   Keyboard,
+  TextInput,
+  StatusBar,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import React, { useLayoutEffect, useState } from "react";
 import { Avatar } from "react-native-elements";
-import { AntDesign, FontAwesome, Ionicons } from "@expo/vector-icons";
-import { StatusBar } from "expo-status-bar";
+import { auth, db } from "../firebase";
 import firebase from "firebase/compat/app";
-import { db, auth } from "../firebase";
+import { AntDesign, FontAwesome, Ionicons } from "@expo/vector-icons";
 
-const ChatScreen = ({ navigation, route }) => {
+export default function ChatScreen({ navigation, route }) {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       title: "Chat",
-      headerBackTitleVisible: false,
+      //headerBackTitleVisible: false,
       headerTitleAlign: "left",
       headerTitle: () => (
         <View
@@ -34,25 +34,24 @@ const ChatScreen = ({ navigation, route }) => {
             alignItems: "center",
           }}
         >
-          <Avatar
-            rounded
-            source={{
-              uri: "https://www.pngfind.com/pngs/m/610-6104451_image-placeholder-png-user-profile-placeholder-image-png.png",
-            }}
-          />
-          <Text style={{ color: "white", marginLeft: 10, fontWeight: "700" }}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Home")}
+            activeOpacity={0.5}
+          >
+            <Avatar
+              rounded
+              source={{
+                uri: messages[0]?.data.photoURL,
+              }}
+            />
+          </TouchableOpacity>
+
+          <Text style={{ color: "#fff", marginLeft: 10, fontWeight: "700" }}>
             {route.params.chatName}
           </Text>
         </View>
       ),
-      headerLeft: () => (
-        <TouchableOpacity
-          style={{ marginLeft: 10 }}
-          onPress={navigation.goBack}
-        >
-          <AntDesign name="arrowleft" size={24} color="white" />
-        </TouchableOpacity>
-      ),
+      headerLeft: () => <TouchableOpacity></TouchableOpacity>,
       headerRight: () => (
         <View
           style={{
@@ -63,15 +62,15 @@ const ChatScreen = ({ navigation, route }) => {
           }}
         >
           <TouchableOpacity>
-            <FontAwesome name="video-camera" size={24} color="white" />
+            <FontAwesome name="video-camera" size={24} color="#fff" />
           </TouchableOpacity>
           <TouchableOpacity>
-            <Ionicons name="call" size={24} color="white" />
+            <Ionicons name="call" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
       ),
     });
-  }, [navigation]);
+  }, [navigation, messages]);
 
   const sendMessage = () => {
     Keyboard.dismiss();
@@ -83,16 +82,15 @@ const ChatScreen = ({ navigation, route }) => {
       email: auth.currentUser.email,
       photoURL: auth.currentUser.photoURL,
     });
-
     setInput("");
   };
 
   useLayoutEffect(() => {
-    const unsubscribe = db
+    const unSubscribe = db
       .collection("chats")
       .doc(route.params.id)
       .collection("messages")
-      .orderBy("timestamp")
+      .orderBy("timestamp", "desc")
       .onSnapshot((snapshot) =>
         setMessages(
           snapshot.docs.map((doc) => ({
@@ -101,37 +99,36 @@ const ChatScreen = ({ navigation, route }) => {
           }))
         )
       );
-
-    return unsubscribe;
+    return unSubscribe;
   }, [route]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: "#fff",
+      }}
+    >
       <StatusBar style="light" />
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
         keyboardVerticalOffset={90}
+        behavior={Platform.OS === "ios" ? "padding" : null}
+        style={styles.container}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <>
-            <ScrollView
-              contentContainerStyle={{
-                paddingTop: 15,
-              }}
-            >
+            <ScrollView contentContainerStyle={{ paddingTop: 15 }}>
               {messages.map(({ id, data }) =>
                 data.email === auth.currentUser.email ? (
                   <View key={id} style={styles.receiver}>
                     <Avatar
                       position="absolute"
-                      rounded
-                      // WEB
                       containerStyle={{
                         position: "absolute",
                         bottom: -15,
                         right: -5,
                       }}
+                      rounded
                       bottom={-15}
                       right={-5}
                       size={30}
@@ -142,18 +139,17 @@ const ChatScreen = ({ navigation, route }) => {
                     <Text style={styles.receiverText}>{data.message}</Text>
                   </View>
                 ) : (
-                  <View style={styles.sender}>
+                  <View key={id} style={styles.sender}>
                     <Avatar
                       position="absolute"
-                      rounded
-                      // WEB
                       containerStyle={{
                         position: "absolute",
                         bottom: -15,
-                        right: -5,
+                        left: -5,
                       }}
+                      rounded
                       bottom={-15}
-                      right={-5}
+                      left={-5}
                       size={30}
                       source={{
                         uri: data.photoURL,
@@ -170,7 +166,7 @@ const ChatScreen = ({ navigation, route }) => {
                 value={input}
                 onChangeText={(text) => setInput(text)}
                 onSubmitEditing={sendMessage}
-                placeholder="Signal Message"
+                placeholder="Single Message"
                 style={styles.textInput}
               />
               <TouchableOpacity onPress={sendMessage} activeOpacity={0.5}>
@@ -182,49 +178,11 @@ const ChatScreen = ({ navigation, route }) => {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-};
-
-export default ChatScreen;
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  receiver: {
-    padding: 15,
-    backgroundColor: "#ECECEC",
-    alignSelf: "flex-end",
-    borderRadius: 20,
-    marginRight: 15,
-    marginBottom: 20,
-    maxWidth: "80%",
-    position: "relative",
-  },
-  receiverText: {
-    color: "#black",
-    fontWeight: "500",
-    marginLeft: 10,
-  },
-  sender: {
-    padding: 15,
-    backgroundColor: "#2B68E6",
-    alignSelf: "flex-start",
-    borderRadius: 20,
-    margin: 15,
-    maxWidth: "80%",
-    position: "relative",
-  },
-  senderText: {
-    color: "white",
-    fontWeight: "500",
-    marginLeft: 10,
-    marginBottom: 15,
-  },
-  senderName: {
-    left: 10,
-    paddingRight: 10,
-    fontSize: 10,
-    color: "white",
   },
   footer: {
     flexDirection: "row",
@@ -239,7 +197,45 @@ const styles = StyleSheet.create({
     marginRight: 15,
     backgroundColor: "#ECECEC",
     padding: 10,
-    color: "grey",
+    color: "gray",
     borderRadius: 30,
+  },
+
+  senderText: {
+    color: "#fff",
+    fontWeight: "500",
+    marginLeft: 10,
+    marginBottom: 15,
+  },
+
+  senderName: {
+    left: 10,
+    paddingRight: 10,
+    fontSize: 10,
+    color: "#fff",
+  },
+  receiver: {
+    padding: 15,
+    backgroundColor: "#ECECEC",
+    alignSelf: "flex-end",
+    borderRadius: 20,
+    marginRight: 15,
+    marginBottom: 20,
+    maxWidth: "80%",
+    position: "relative",
+  },
+  sender: {
+    padding: 15,
+    backgroundColor: "#2068E6",
+    alignSelf: "flex-start",
+    borderRadius: 20,
+    margin: 15,
+    maxWidth: "80%",
+    position: "relative",
+  },
+  receiverText: {
+    color: "#000",
+    fontWeight: "500",
+    marginLeft: 10,
   },
 });
