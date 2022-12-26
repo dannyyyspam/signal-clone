@@ -4,8 +4,8 @@
 
 #### PREREQUISITES:
 
-- Sign up for a Firebase account <a href='https://firebase.google.com'>HERE</a>
-- Install Node JS on your computer <a href='https://nodejs.org/en/'>HERE</a>
+- Sign up for a Firebase account <a href='https://firebase.google.com' target="_blank">HERE</a>
+- Install Node JS on your computer <a href='https://nodejs.org/en/' target="_blank">HERE</a>
 
 <a href="#react"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" alt="React" width="30" height="30" /></a>
 <a href="#javascript"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-plain.svg" alt="JavaScript" width="30" height="30" /></a>
